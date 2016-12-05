@@ -1,0 +1,19 @@
+html{
+    font-size: 62.5%;
+}
+.ion-record{
+    display: block;
+    width: 4px;
+    height: 4px;
+    background-color: red;
+    border-radius: 50%;
+}
+.barSlide{
+    width: 80rem;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: row;
+        flex-direction: row;
+    -ms-flex-pack: justify;
+        justify-content: space-between
+}

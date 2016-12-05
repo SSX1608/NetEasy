@@ -1,0 +1,35 @@
+
+
+
+<ion-view class="modal" >
+    <ion-nav-bar class="bar-assertive">
+        <ion-nav-buttons side="left">
+            <h4 style="color: white">网易新闻</h4>
+        </ion-nav-buttons>
+
+        <ion-nav-buttons side="right">
+            <a href="#/tabs/search" class="button icon-right ion-ios-search button-clear button-white" ng-click="closeModal()"></a>
+            <a href="#/tabs/live" class="button icon-right  ion-social-youtube-outline button-clear button-white" ng-click="closeModal()"></a>
+        </ion-nav-buttons>
+    </ion-nav-bar>
+
+    <ion-header-bar class="bar bar-subheader">
+
+        <ion-scroll direction="x" scrollbar-x="false">
+            <div class="barSlide">
+                <h4 ng-repeat="item in items">{{item}}</h4>
+            </div>
+        </ion-scroll>
+        <a class="button icon-left ion-ios-arrow-up button-clear button-dark" ng-click="closeModal()"></a>
+
+    </ion-header-bar>
+    <!--承载模态窗口的页面必须写上class=“modal”  不写没有动画-->
+
+    <ion-content>
+
+            <button class="button button-small button-balanced" ng-click="closeModal()">关闭窗口</button>
+
+
+    </ion-content>
+
+</ion-view>
