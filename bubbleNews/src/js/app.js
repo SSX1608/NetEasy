@@ -1,10 +1,11 @@
 /**
  * Created by qingyun on 16/11/30.
  */
-angular.module('cftApp',['ionic','cftApp.httpFactory','cftApp.tabs','cftApp.news','cftApp.search','cftApp.live','cftApp.topic','cftApp.personal','cftApp.slideBox']).config(['$stateProvider','$urlRouterProvider','$ionicConfigProvider',function ($stateProvider,$urlRouterProvider,$ionicConfigProvider) {
+angular.module('myApp',['ionic','myApp.httpFactory','myApp.slideBox','myApp.tabs','myApp.news','myApp.search','myApp.live','myApp.topic','myApp.personal']).config(['$stateProvider','$urlRouterProvider','$ionicConfigProvider',function ($stateProvider,$urlRouterProvider,$ionicConfigProvider) {
+    $ionicConfigProvider.views.transition('ios');
     $ionicConfigProvider.tabs.position('bottom');
-    $ionicConfigProvider.tabs.style('standard');
     $ionicConfigProvider.navBar.alignTitle('center');
+    $ionicConfigProvider.tabs.style('standard');
     $stateProvider.state("tabs",{
         url:"/tabs",
         abstract:true,

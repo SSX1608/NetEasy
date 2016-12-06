@@ -1,7 +1,7 @@
 /**
  * Created by qingyun on 16/11/30.
  */
-angular.module('cftApp.tabs',[]).controller('tabsController',['$scope',function ($scope) {
+angular.module('myApp.tabs',[]).controller('tabsController',['$scope',function ($scope) {
     $scope.$on('$stateChangeSuccess',function (evt,current,previous) {
         var update_wx_title = function(title) {
             var body = document.getElementsByTagName('body')[0];
