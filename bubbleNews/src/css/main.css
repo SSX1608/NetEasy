@@ -3,14 +3,77 @@ html{
 }
 .ion-record{
     display: block;
-    width: 4px;
-    height: 4px;
+    width: 0.4rem;
+    height: 0.4rem;
     background-color: red;
     border-radius: 50%;
 }
 .barSlide{
-    width: 80rem;
+    width: 100rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between
 }
+@media all and (max-width: 480px){
+
+    .topCarouselImg{
+        height: 18rem;
+        width: 100%;
+    }
+}
+@media all and (min-width: 480px) {
+    .topCarouselImg {
+        height: 24rem;
+        width: 100%;
+    }
+}
+
+.topCarousel{
+    position: relative;
+    width: 100%;
+
+}
+.topCarousel .slider-pager{
+    text-align: right;
+    padding-right: 2rem;
+    padding-top: .5rem;
+    /*height: 3rem;*/
+}
+
+.topCarousel .slider-pager-page{
+    width: .2rem;
+}
+.slider-pager .slider-pager-page {
+    opacity: .1;
+}
+.topCarousel .ion-record::before{
+    content: '•';
+}
+.topCarousel .ion-record{
+    font-size: 1.8rem;
+    color: white;
+}
+.slideBottomDiv{
+    position: absolute;
+    padding-left: 1.5rem;
+    bottom: .6rem;
+    width: 100%;
+    font-size: 1.5rem;
+    line-height: 3rem;
+    height: 3rem;
+    background-color: rgba(0,0,0,.3);
+    color: white;
+}
+ion-item{
+    /*display: flex;*/
+    /*flex-direction: row;*/
+    /*flex-wrap: wrap;*/
+    /*justify-content: space-between;*/
+    position: relative;
+}
+ion-item p{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
