@@ -43,22 +43,7 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
             }
         }
     });
-}]).controller('newsController',['$scope','$ionicPopup','HttpFactory','$ionicModal','$ionicLoading','$http',function ($scope,$ionicPopup,HttpFactory,$ionicModal,$ionicLoading,$http) {
-
-    //模态页面
-    $ionicModal.fromTemplateUrl('modal.html',{
-        scope:$scope,
-        animation: 'slide-in-up'
-    }).then(function(modal) {
-        $scope.modal = modal;
-        console.log(modal);
-    });
-    $scope.openModal = function() {
-        $scope.modal.show();
-    };
-    $scope.closeModal = function() {
-        $scope.modal.hide();
-    };
+}]).controller('newsController',['$scope','$ionicPopup','$ionicSlideBoxDelegate','HttpFactory','$ionicLoading',function ($scope,$ionicPopup,$ionicSlideBoxDelegate,HttpFactory,$ionicLoading) {
 
     //滚动条
     $scope.scrollItems=['头条','要闻','娱乐','体育','网易号','郑州','视频','财经','科技','汽车','时尚','图片','直播','热点','跟帖','房产','股票','家居','独家','游戏'];
@@ -70,7 +55,6 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
     var url = "http://c.3g.163.com/recommend/getSubDocPic?tid=T1348647909107&from=toutiao&offset=0&size=10";
     HttpFactory.getData(url).then(function (result) {
         $scope.news.newsArray = result;
-        // console.log($scope.news.newsArray);
         $scope.news.adsArray = result[0].ads;
     });
 
@@ -107,6 +91,28 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
     $scope.doRefresh = function () {
         index = 10;
         $scope.loadMore();
+    };
+
+    //滑动页面
+    $scope.dragOpenSlide = function () {
+        //滑动content的时候能滑动页面
+        $ionicSlideBoxDelegate.$getByHandle('mainSlideBox').enableSlide(true);
+    };
+    $scope.slideChanged = function () {
+        //滑动页面完毕关闭底层mainSlideBox的滑动
+        $ionicSlideBoxDelegate.$getByHandle('mainSlideBox').enableSlide(false);
+
+    };
+    
+//    按钮动画
+    $scope.openBnts=function () {
+            var btns_icon = document.querySelector('#btnIcon');
+            if (btns_icon.style.transform == 'rotate(180deg)'){
+                btns_icon.setAttribute('style','transform:rotate(0deg)')
+            }else {
+                btns_icon.setAttribute('style','transform:rotate(180deg)')
+            }
+        document.querySelector('#div').style.display='block';
     }
 }]);
 /**
@@ -229,29 +235,31 @@ angular.module('myApp.slideBox',[]).directive('mgSlideBox',[function () {
     return{
         restrict:"E",
         scope:{sourceArray:'='},
-        template:'<div class="topCarousel"><ion-slide-box delegate-handle="topCarouselSlideBox" on-slide-changed="slideHasChanged($index)" auto-play="true" slide-interval="1000" show-pager="true" does-continue="true" ng-if="isShowSlideBox" ng-mouseenter="drag()" ng-mouseleave="leave()"> <ion-slide ng-repeat="ads in sourceArray track by $index" ng-click="goToDetailView($index)"><img ng-src="{{ads.imgsrc}}" class="topCarouselImg"></ion-slide> </ion-slide-box><div class="slideBottomDiv"></div></div>',
+        template:'<div class="topCarousel"><ion-slide-box delegate-handle="topCarouselSlideBox" on-slide-changed="slideHasChanged($index)" auto-play="true" slide-interval="1000" show-pager="true" does-continue="true" ng-if="isShowSlideBox" on-drag="drag($event)"> <ion-slide ng-repeat="ads in sourceArray track by $index" ng-click="goToDetailView($index)"><img ng-src="{{ads.imgsrc}}" class="topCarouselImg"></ion-slide> </ion-slide-box><div class="slideBottomDiv"></div></div>',
         controller:['$scope','$element','$ionicSlideBoxDelegate',function ($scope,$element,$ionicSlideBoxDelegate) {
             $scope.goToDetailView = function (index) {
                 console.log('进入详情页' + index);
             };
             var lastSpan = $element[0].lastElementChild;
-            // $scope.sourceArray = [1,2,3,4,5];
+
             $scope.$watch('sourceArray',function (newVal,oldVal) {
                 if (newVal && newVal.length){
                     $scope.isShowSlideBox = true;
                     // $ionicSlideBoxDelegate.$getByHandle('topCarouselSlideBox').update();
                     // $ionicSlideBoxDelegate.$getByHandle('topCarouselSlideBox').loop(true);
-                    // lastSpan.innerText = $scope.sourceArray[0].title;
+                    lastSpan.innerText = $scope.sourceArray[0].title;
                 }
             });
             $scope.slideHasChanged = function (index) {
                 // lastSpan.innerText = $scope.sourceArray[index].title;
             };
-            $scope.drag = function () {
+
                 $ionicSlideBoxDelegate.$getByHandle('mainSlideBox').enableSlide(false);
-            };
-            $scope.leave = function () {
-                $ionicSlideBoxDelegate.$getByHandle('mainSlideBox').enableSlide(true);
+
+            $scope.drag = function (event) {
+                $ionicSlideBoxDelegate.$getByHandle('mainSlideBox').enableSlide(false);
+                //阻止事件冒泡
+                event.stopPropagation();
             };
         }],
         replace:true,

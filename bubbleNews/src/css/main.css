@@ -1,19 +1,6 @@
 html{
     font-size: 62.5%;
 }
-.ion-record{
-    display: block;
-    width: 0.4rem;
-    height: 0.4rem;
-    background-color: red;
-    border-radius: 50%;
-}
-.barSlide{
-    width: 100rem;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between
-}
 @media all and (max-width: 480px){
 
     .topCarouselImg{
@@ -28,6 +15,13 @@ html{
     }
 }
 
+.barSlide{
+    width: 100rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between
+}
+
 .topCarousel{
     position: relative;
     width: 100%;
@@ -37,7 +31,6 @@ html{
     text-align: right;
     padding-right: 2rem;
     padding-top: .5rem;
-    /*height: 3rem;*/
 }
 
 .topCarousel .slider-pager-page{
@@ -65,10 +58,6 @@ html{
     color: white;
 }
 ion-item{
-    /*display: flex;*/
-    /*flex-direction: row;*/
-    /*flex-wrap: wrap;*/
-    /*justify-content: space-between;*/
     position: relative;
 }
 ion-item p{

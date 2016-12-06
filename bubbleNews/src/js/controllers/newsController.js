@@ -11,22 +11,7 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
             }
         }
     });
-}]).controller('newsController',['$scope','$ionicPopup','HttpFactory','$ionicModal','$ionicLoading','$http',function ($scope,$ionicPopup,HttpFactory,$ionicModal,$ionicLoading,$http) {
-
-    //模态页面
-    $ionicModal.fromTemplateUrl('modal.html',{
-        scope:$scope,
-        animation: 'slide-in-up'
-    }).then(function(modal) {
-        $scope.modal = modal;
-        console.log(modal);
-    });
-    $scope.openModal = function() {
-        $scope.modal.show();
-    };
-    $scope.closeModal = function() {
-        $scope.modal.hide();
-    };
+}]).controller('newsController',['$scope','$ionicPopup','$ionicSlideBoxDelegate','HttpFactory','$ionicLoading',function ($scope,$ionicPopup,$ionicSlideBoxDelegate,HttpFactory,$ionicLoading) {
 
     //滚动条
     $scope.scrollItems=['头条','要闻','娱乐','体育','网易号','郑州','视频','财经','科技','汽车','时尚','图片','直播','热点','跟帖','房产','股票','家居','独家','游戏'];
@@ -38,7 +23,6 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
     var url = "http://c.3g.163.com/recommend/getSubDocPic?tid=T1348647909107&from=toutiao&offset=0&size=10";
     HttpFactory.getData(url).then(function (result) {
         $scope.news.newsArray = result;
-        // console.log($scope.news.newsArray);
         $scope.news.adsArray = result[0].ads;
     });
 
@@ -75,5 +59,27 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
     $scope.doRefresh = function () {
         index = 10;
         $scope.loadMore();
+    };
+
+    //滑动页面
+    $scope.dragOpenSlide = function () {
+        //滑动content的时候能滑动页面
+        $ionicSlideBoxDelegate.$getByHandle('mainSlideBox').enableSlide(true);
+    };
+    $scope.slideChanged = function () {
+        //滑动页面完毕关闭底层mainSlideBox的滑动
+        $ionicSlideBoxDelegate.$getByHandle('mainSlideBox').enableSlide(false);
+
+    };
+    
+//    按钮动画
+    $scope.openBnts=function () {
+            var btns_icon = document.querySelector('#btnIcon');
+            if (btns_icon.style.transform == 'rotate(180deg)'){
+                btns_icon.setAttribute('style','transform:rotate(0deg)')
+            }else {
+                btns_icon.setAttribute('style','transform:rotate(180deg)')
+            }
+        document.querySelector('#div').style.display='block';
     }
 }]);
