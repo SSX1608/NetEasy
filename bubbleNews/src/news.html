@@ -24,9 +24,14 @@
 
     </ion-header-bar>
 
-
-    <div id="div" style="width: 100%; height: 100%; z-index: 999;background-color: rgba(200,200,200,.7);position: fixed;top: 88px;display: none">
-
+<!--按钮页面-->
+    <div id="div" style="width: 100%; height: 100%; z-index: 998;color:red;background-color: rgba(200,200,200,.7);position: fixed;top: 88px;display: none">
+       <div style="width: 100%; height: 50px; position: absolute; top: 0; background-color: #e6b500;z-index: 999;" >
+           <button ng-repeat="btn in btnArray" class="button button-calm"  style="margin: 5px">{{btn}}</button>
+       </div>
+        <div style="width: 100%; height: 50px;position: absolute; bottom: 0; background-color: chartreuse;z-index: 999;">
+            <button ng-repeat="btn in btnArray" class="button button-calm"  style="margin: 5px">{{btn}}</button>
+        </div>
     </div>
 <!--新闻内容-->
     <ion-content on-drag="dragOpenSlide()">

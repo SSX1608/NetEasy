@@ -105,14 +105,18 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
     };
     
 //    按钮动画
+    $scope.btnArray=['头条','要闻','娱乐','体育','郑州','视频','财经','科技','汽车','时尚','图片','直播','热点','跟帖','房产','股票','家居','独家','游戏','网易号'];
     $scope.openBnts=function () {
             var btns_icon = document.querySelector('#btnIcon');
+            var div=document.querySelector('#div');
             if (btns_icon.style.transform == 'rotate(180deg)'){
-                btns_icon.setAttribute('style','transform:rotate(0deg)')
+                btns_icon.setAttribute('style','transform:rotate(0deg)');
+                div.style.display='none';
             }else {
-                btns_icon.setAttribute('style','transform:rotate(180deg)')
+                btns_icon.setAttribute('style','transform:rotate(180deg)');
+                div.style.display='block';
             }
-        document.querySelector('#div').style.display='block';
+
     }
 }]);
 /**
