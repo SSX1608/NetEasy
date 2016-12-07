@@ -6,9 +6,7 @@ angular.module('myApp.httpFactory',[]).factory('HttpFactory',['$http','$q',funct
         getData:function (url,type) {
             if (url){
                 var promise = $q.defer();
-                // url = "http://192.168.0.100:3000/?myUrl=" + encodeURIComponent(url);
                 url = "http://localhost:3000/?myUrl=" + encodeURIComponent(url);
-                // url = "http://192.168.0.204:3000/?myUrl=" + encodeURIComponent(url);
                 type = type ? type:"GET";
                 $http({
                     url:url,
@@ -16,7 +14,13 @@ angular.module('myApp.httpFactory',[]).factory('HttpFactory',['$http','$q',funct
                     timeout:20000
                 }).then(function (reslut) {
                     reslut =reslut.data;
+                    // console.log(reslut);
+                    // console.log('----------');
+                    //Object.keys(reslut)就是返回一个对象键名列表的数组；[]也是点语法取键值
+                    //reslut[Object.keys(reslut)[0]]就取出了result的第一个键值的值；
                     reslut = reslut[Object.keys(reslut)[0]];
+                    // console.log(Object.keys(reslut)[0]);
+                    // console.log('----------');
                     promise.resolve(reslut);
                 },function (err) {
                     promise.reject(err);

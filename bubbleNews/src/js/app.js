@@ -11,6 +11,10 @@ angular.module('myApp',['ionic','myApp.httpFactory','myApp.slideBox','myApp.tabs
         abstract:true,
         templateUrl:"tabs.html",
         controller:'tabsController'
+    }).state("detail",{
+        url:"/detail",
+        templateUrl:"detail.html"
+        // controller:'detailController'
     });
     $urlRouterProvider.otherwise('tabs/news');
 }]);

@@ -11,13 +11,14 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
             }
         }
     });
-}]).controller('newsController',['$scope','$ionicPopup','$ionicSlideBoxDelegate','HttpFactory','$ionicLoading',function ($scope,$ionicPopup,$ionicSlideBoxDelegate,HttpFactory,$ionicLoading) {
+}]).controller('newsController',['$scope','$ionicPopup','$ionicSlideBoxDelegate','HttpFactory','$ionicLoading','$state','$ionicViewSwitcher',function ($scope,$ionicPopup,$ionicSlideBoxDelegate,HttpFactory,$ionicLoading,$state,$ionicViewSwitcher) {
 
     //滚动条
     $scope.scrollItems=['头条','要闻','娱乐','体育','网易号','郑州','视频','财经','科技','汽车','时尚','图片','直播','热点','跟帖','房产','股票','家居','独家','游戏'];
+
     //轮播图
     $scope.news = {
-        newsArray:'',
+        newsArray:[],
         adsArray:[]
     };
     var url = "http://c.3g.163.com/recommend/getSubDocPic?tid=T1348647909107&from=toutiao&offset=0&size=10";
@@ -36,11 +37,11 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
         var url = "http://c.3g.163.com/recommend/getSubDocPic?tid=T1348647909107&from=toutiao&offset=0&size="+ index;
         HttpFactory.getData(url).then(function (result) {
             result.splice(0,1);
-            console.log(result);
+            // console.log(result);
             $scope.items = result;
             //关闭动画 跟方法无关，刷新完成后，使用$broadcast广播scroll.refreshComplete事件。
             $scope.$broadcast('scroll.refreshComplete');
-            if ($scope.items.length < 8){
+            if ($scope.items.length < 10){
                 $scope.isShowInfinite = false;
             }else {
                 $scope.isShowInfinite = true;
@@ -50,9 +51,6 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
         },function (err) {
 
         })
-    };
-    $scope.doSome = function () {
-        console.log('正在下拉！');
     };
 
     //刷新。直接再一次请求原来的数据，显示出来，调用loadMore函数
@@ -85,5 +83,9 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
                 div.style.display='block';
             }
 
+    };
+    $scope.goDetail=function () {
+        $state.go('detail');
+        $ionicViewSwitcher.nextDirection("forward");
     }
 }]);

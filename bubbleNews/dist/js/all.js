@@ -11,6 +11,10 @@ angular.module('myApp',['ionic','myApp.httpFactory','myApp.slideBox','myApp.tabs
         abstract:true,
         templateUrl:"tabs.html",
         controller:'tabsController'
+    }).state("detail",{
+        url:"/detail",
+        templateUrl:"detail.html"
+        // controller:'detailController'
     });
     $urlRouterProvider.otherwise('tabs/news');
 }]);
@@ -43,13 +47,14 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
             }
         }
     });
-}]).controller('newsController',['$scope','$ionicPopup','$ionicSlideBoxDelegate','HttpFactory','$ionicLoading',function ($scope,$ionicPopup,$ionicSlideBoxDelegate,HttpFactory,$ionicLoading) {
+}]).controller('newsController',['$scope','$ionicPopup','$ionicSlideBoxDelegate','HttpFactory','$ionicLoading','$state','$ionicViewSwitcher',function ($scope,$ionicPopup,$ionicSlideBoxDelegate,HttpFactory,$ionicLoading,$state,$ionicViewSwitcher) {
 
     //滚动条
     $scope.scrollItems=['头条','要闻','娱乐','体育','网易号','郑州','视频','财经','科技','汽车','时尚','图片','直播','热点','跟帖','房产','股票','家居','独家','游戏'];
+
     //轮播图
     $scope.news = {
-        newsArray:'',
+        newsArray:[],
         adsArray:[]
     };
     var url = "http://c.3g.163.com/recommend/getSubDocPic?tid=T1348647909107&from=toutiao&offset=0&size=10";
@@ -68,11 +73,11 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
         var url = "http://c.3g.163.com/recommend/getSubDocPic?tid=T1348647909107&from=toutiao&offset=0&size="+ index;
         HttpFactory.getData(url).then(function (result) {
             result.splice(0,1);
-            console.log(result);
+            // console.log(result);
             $scope.items = result;
             //关闭动画 跟方法无关，刷新完成后，使用$broadcast广播scroll.refreshComplete事件。
             $scope.$broadcast('scroll.refreshComplete');
-            if ($scope.items.length < 8){
+            if ($scope.items.length < 10){
                 $scope.isShowInfinite = false;
             }else {
                 $scope.isShowInfinite = true;
@@ -82,9 +87,6 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
         },function (err) {
 
         })
-    };
-    $scope.doSome = function () {
-        console.log('正在下拉！');
     };
 
     //刷新。直接再一次请求原来的数据，显示出来，调用loadMore函数
@@ -117,6 +119,10 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
                 div.style.display='block';
             }
 
+    };
+    $scope.goDetail=function () {
+        $state.go('detail');
+        $ionicViewSwitcher.nextDirection("forward");
     }
 }]);
 /**
@@ -212,9 +218,7 @@ angular.module('myApp.httpFactory',[]).factory('HttpFactory',['$http','$q',funct
         getData:function (url,type) {
             if (url){
                 var promise = $q.defer();
-                // url = "http://192.168.0.100:3000/?myUrl=" + encodeURIComponent(url);
                 url = "http://localhost:3000/?myUrl=" + encodeURIComponent(url);
-                // url = "http://192.168.0.204:3000/?myUrl=" + encodeURIComponent(url);
                 type = type ? type:"GET";
                 $http({
                     url:url,
@@ -222,7 +226,13 @@ angular.module('myApp.httpFactory',[]).factory('HttpFactory',['$http','$q',funct
                     timeout:20000
                 }).then(function (reslut) {
                     reslut =reslut.data;
+                    // console.log(reslut);
+                    // console.log('----------');
+                    //Object.keys(reslut)就是返回一个对象键名列表的数组；[]也是点语法取键值
+                    //reslut[Object.keys(reslut)[0]]就取出了result的第一个键值的值；
                     reslut = reslut[Object.keys(reslut)[0]];
+                    // console.log(Object.keys(reslut)[0]);
+                    // console.log('----------');
                     promise.resolve(reslut);
                 },function (err) {
                     promise.reject(err);
@@ -238,31 +248,52 @@ angular.module('myApp.httpFactory',[]).factory('HttpFactory',['$http','$q',funct
 angular.module('myApp.slideBox',[]).directive('mgSlideBox',[function () {
     return{
         restrict:"E",
+        //双向绑定
         scope:{sourceArray:'='},
-        template:'<div class="topCarousel"><ion-slide-box delegate-handle="topCarouselSlideBox" on-slide-changed="slideHasChanged($index)" auto-play="true" slide-interval="1000" show-pager="true" does-continue="true" ng-if="isShowSlideBox" on-drag="drag($event)"> <ion-slide ng-repeat="ads in sourceArray track by $index" ng-click="goToDetailView($index)"><img ng-src="{{ads.imgsrc}}" class="topCarouselImg"></ion-slide> </ion-slide-box><div class="slideBottomDiv"></div></div>',
-        controller:['$scope','$element','$ionicSlideBoxDelegate',function ($scope,$element,$ionicSlideBoxDelegate) {
+        template:'<div class="topCarousel">' +
+                        '<ion-slide-box ' +
+                            'delegate-handle="topCarouselSlideBox" ' +
+                            'on-slide-changed="slideHasChanged($index)" ' +
+                            'auto-play="true" ' +
+                            'slide-interval="1000" ' +
+                            'show-pager="true" ' +
+                            'does-continue="true" ' +
+                            'ng-if="isShowSlideBox" ' +
+                            'on-drag="drag($event)"> ' +
+                                '<ion-slide ng-repeat="ads in sourceArray track by $index" ' +
+                                        'ng-click="goToDetailView($index)">' +
+                                    '<img ng-src="{{ads.imgsrc}}" class="topCarouselImg">' +
+                                '</ion-slide>' +
+                        '</ion-slide-box>' +
+                    '<div class="slideBottomDiv"></div></div>',
+        controller:['$scope','$element','$ionicSlideBoxDelegate','$state','$ionicViewSwitcher',function ($scope,$element,$ionicSlideBoxDelegate,$state,$ionicViewSwitcher) {
+            //点击轮播图进入详情页
             $scope.goToDetailView = function (index) {
+                $state.go('detail');
+                $ionicViewSwitcher.nextDirection("forward");
                 console.log('进入详情页' + index);
             };
-            var lastSpan = $element[0].lastElementChild;
 
+            //$element代表引入的模板内容，在angular里面是JqLite元素，所以要加下标；lastElementChild是最后一个子元素，这里就是img
+            var lastSpan = $element[0].lastElementChild;
+            //监听数据获取完成之后显示轮播图
             $scope.$watch('sourceArray',function (newVal,oldVal) {
                 if (newVal && newVal.length){
                     $scope.isShowSlideBox = true;
-                    // $ionicSlideBoxDelegate.$getByHandle('topCarouselSlideBox').update();
-                    // $ionicSlideBoxDelegate.$getByHandle('topCarouselSlideBox').loop(true);
+                    //刚加载出来时显示第一个的title
                     lastSpan.innerText = $scope.sourceArray[0].title;
                 }
             });
+
+            //轮播滑动时改变轮播上的title
             $scope.slideHasChanged = function (index) {
-                // lastSpan.innerText = $scope.sourceArray[index].title;
+                lastSpan.innerText = $scope.sourceArray[index].title;
             };
 
-                $ionicSlideBoxDelegate.$getByHandle('mainSlideBox').enableSlide(false);
-
+            //当拖动轮播图时阻止下面的新闻列表滑动
             $scope.drag = function (event) {
                 $ionicSlideBoxDelegate.$getByHandle('mainSlideBox').enableSlide(false);
-                //阻止事件冒泡
+                //阻止事件冒泡到content父元素上
                 event.stopPropagation();
             };
         }],

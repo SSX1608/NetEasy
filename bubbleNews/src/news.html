@@ -12,12 +12,12 @@
         </ion-nav-buttons>
     </ion-nav-bar>
 
-<!--副导航条-->
+<!--副导航条subheader-->
     <ion-header-bar class="bar bar-subheader">
 
         <ion-scroll direction="x" scrollbar-x="false">
             <div class="barSlide">
-                <h4 ng-repeat="scrollItem in scrollItems">{{scrollItem}}</h4>
+                <h5 ng-repeat="scrollItem in scrollItems">{{scrollItem}}</h5>
             </div>
         </ion-scroll>
         <a id="btnIcon" class="button icon-left ion-ios-arrow-down button-clear button-dark" ng-click="openBnts()"></a>
@@ -25,7 +25,7 @@
     </ion-header-bar>
 
 <!--按钮页面-->
-    <div id="div" style="width: 100%; height: 100%; z-index: 998;color:red;background-color: rgba(200,200,200,.7);position: fixed;top: 88px;display: none">
+    <div id="div" style="width: 100%; height: 100%; z-index: 998;color:red;background-color: rgba(255,255,255,.8);position: fixed;top: 88px;display: none">
        <div style="width: 100%; height: 50px; position: absolute; top: 0; background-color: #e6b500;z-index: 999;" >
            <button ng-repeat="btn in btnArray" class="button button-calm"  style="margin: 5px">{{btn}}</button>
        </div>
@@ -34,20 +34,24 @@
         </div>
     </div>
 <!--新闻内容-->
+    <!--下拉刷新-->
     <ion-content on-drag="dragOpenSlide()">
         <ion-refresher
                 pulling-text="下拉刷新..."
                 on-refresh="doRefresh()"
-                on-pulling="doSome()"
                 spinner="lines"
                 refreshing-text="正在刷新...">
         </ion-refresher>
 
+        <!--滑动页面-->
         <ion-slide-box show-pager="false" style="margin-top: -20px" delegate-handle="mainSlideBox" on-slide-changed="slideChanged($index)">
-            <!--轮播图-->
+            <!--滑动页面1-->
             <ion-slide>
+                <!--轮播图；mg-slide-box 是自定义的指令，用-分开用做标签；source-array就是指令中定义的数组sourceArray，接受实参数组-->
+                <!--相当于在此处引入template的模板-->
                 <mg-slide-box source-array="news.adsArray"></mg-slide-box>
-                <ion-list ng-repeat="item in items" class="list">
+                <!--新闻列表-->
+                <ion-list ng-repeat="item in items" class="list" ng-click="goDetail()">
                     <ion-item style="height: 100px" class="item item-thumbnail-left item-text-wrap">
                         <img src="{{item.imgsrc}}" alt="" style="width: 150px;height: 70px">
                         <span class="io">{{item.title}}</span>
@@ -55,19 +59,25 @@
                     </ion-item>
                 </ion-list>
             </ion-slide>
+
+            <!--滑动页面2-->
             <ion-slide>
                 <mg-slide-box source-array="news.newsArray"></mg-slide-box>
-                <ion-item ng-repeat="num in [1,2,3,4,5,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1] track by $index">
-                    {{num}}
+                <ion-item ng-repeat="item in items">
+                    {{item.title}}
                 </ion-item>
             </ion-slide>
+
+            <!--滑动页面3-->
             <ion-slide>
-                <ion-item ng-repeat="num in [1,2,3,4,5,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1] track by $index">
-                    {{num}}
+                <mg-slide-box source-array="news.newsArray"></mg-slide-box>
+                <ion-item ng-repeat="item in items">
+                    {{item.title}}
                 </ion-item>
             </ion-slide>
         </ion-slide-box>
 
+        <!--上拉加载-->
         <ion-infinite-scroll
                 on-infinite="loadMore('上拉')"
                 distance="1%"
