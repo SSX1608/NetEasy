@@ -1,7 +1,7 @@
 /**
  * Created by qingyun on 16/11/30.
  */
-angular.module('myApp',['ionic','myApp.httpFactory','myApp.slideBox','myApp.tabs','myApp.news','myApp.search','myApp.live','myApp.topic','myApp.personal']).config(['$stateProvider','$urlRouterProvider','$ionicConfigProvider',function ($stateProvider,$urlRouterProvider,$ionicConfigProvider) {
+angular.module('myApp',['ionic','myApp.httpFactory','myApp.slideBox','myApp.tabs','myApp.news','myApp.search','myApp.live','myApp.topic','myApp.personal','myApp.newsSummaryC','myApp.newsFactory']).config(['$stateProvider','$urlRouterProvider','$ionicConfigProvider',function ($stateProvider,$urlRouterProvider,$ionicConfigProvider) {
     $ionicConfigProvider.views.transition('ios');
     $ionicConfigProvider.tabs.position('bottom');
     $ionicConfigProvider.navBar.alignTitle('center');
@@ -11,10 +11,6 @@ angular.module('myApp',['ionic','myApp.httpFactory','myApp.slideBox','myApp.tabs
         abstract:true,
         templateUrl:"tabs.html",
         controller:'tabsController'
-    }).state("detail",{
-        url:"/detail",
-        templateUrl:"detail.html"
-        // controller:'detailController'
     });
     $urlRouterProvider.otherwise('tabs/news');
 }]);
@@ -47,53 +43,78 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
             }
         }
     });
-}]).controller('newsController',['$scope','$ionicPopup','$ionicSlideBoxDelegate','HttpFactory','$ionicLoading','$state','$ionicViewSwitcher',function ($scope,$ionicPopup,$ionicSlideBoxDelegate,HttpFactory,$ionicLoading,$state,$ionicViewSwitcher) {
+}]).controller('newsController',['$scope','$ionicPopup','$ionicSlideBoxDelegate','HttpFactory','$ionicLoading','$state','$ionicViewSwitcher','$rootScope','$timeout',function ($scope,$ionicPopup,$ionicSlideBoxDelegate,HttpFactory,$ionicLoading,$state,$ionicViewSwitcher,$rootScope,$timeout) {
 
     //滚动条
     $scope.scrollItems=['头条','要闻','娱乐','体育','网易号','郑州','视频','财经','科技','汽车','时尚','图片','直播','热点','跟帖','房产','股票','家居','独家','游戏'];
 
-    //轮播图
+
+    //获取网络数据
     $scope.news = {
         newsArray:[],
-        adsArray:[]
+        adsArray:[],
+        index:0,
+        isFirst:true
     };
-    var url = "http://c.3g.163.com/recommend/getSubDocPic?tid=T1348647909107&from=toutiao&offset=0&size=10";
-    HttpFactory.getData(url).then(function (result) {
-        $scope.news.newsArray = result;
-        $scope.news.adsArray = result[0].ads;
-    });
+    $scope.loadMore = function () {
+        $scope.show();
+        url = "http://c.m.163.com/recommend/getSubDocPic?from=toutiao&prog=LMA1&open=&openpath=&fn=1&passport=&devId=%2BnrKMbpU9ZDPUOhb9gvookO3HKJkIOzrIg%2BI9FhrLRStCu%2B7ZneFbZ30i61TL9kY&offset=" + $scope.news.index +"&size=10&version=17.1&spever=false&net=wifi&lat=&lon=&ts=1480666192&sign=yseE2FNVWcJVjhvP48U1nPHyzZCKpBKh%2BaOhOE2d6GR48ErR02zJ6%2FKXOnxX046I&encryption=1&canal=appstore";
 
-    //上拉加载及下拉刷新
-    var index = 0;
-    $scope.isShowInfinite = true;
-    $scope.loadMore = function (str) {
-        if(str == '上拉'){
-            index += 10;
+        if ($scope.news.index === 0){
+            $scope.news.index += 11;
+        }else {
+            $scope.news.index += 10;
         }
-        var url = "http://c.3g.163.com/recommend/getSubDocPic?tid=T1348647909107&from=toutiao&offset=0&size="+ index;
+
         HttpFactory.getData(url).then(function (result) {
-            result.splice(0,1);
-            // console.log(result);
-            $scope.items = result;
-            //关闭动画 跟方法无关，刷新完成后，使用$broadcast广播scroll.refreshComplete事件。
-            $scope.$broadcast('scroll.refreshComplete');
-            if ($scope.items.length < 10){
-                $scope.isShowInfinite = false;
-            }else {
-                $scope.isShowInfinite = true;
-                //这个上拉加载的事件是告诉程序开启方法的 跟动画无关
-                $scope.$broadcast('scroll.infiniteScrollComplete');
+            $scope.hide();
+            if (!result){
+                alert("没有更多数据!");
+                return;
             }
-        },function (err) {
+            if (!$scope.news.adsArray.length){
+                if(result[0].ads){
+                    //由于网易新闻有时候除了第一次之外没有头条用个数组存着
+                    $scope.news.adsArray = result[0].ads;
+                }
+            }
+            $scope.news.newsArray = $scope.news.newsArray.concat(result);
+            if ($scope.news.index === 0){
+                $scope.news.newsArray.splice(0,1);
+            }
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            console.log($scope.news.newsArray);
 
-        })
+        },function () {
+            $scope.hide();
+        });
     };
 
-    //刷新。直接再一次请求原来的数据，显示出来，调用loadMore函数
     $scope.doRefresh = function () {
-        index = 10;
-        $scope.loadMore();
+        url = "http://c.m.163.com/recommend/getSubDocPic?from=toutiao&prog=LMA1&open=&openpath=&fn=1&passport=&devId=%2BnrKMbpU9ZDPUOhb9gvookO3HKJkIOzrIg%2BI9FhrLRStCu%2B7ZneFbZ30i61TL9kY&offset=" + $scope.news.index +"&size=10&version=17.1&spever=false&net=wifi&lat=&lon=&ts=1480666192&sign=yseE2FNVWcJVjhvP48U1nPHyzZCKpBKh%2BaOhOE2d6GR48ErR02zJ6%2FKXOnxX046I&encryption=1&canal=appstore";
+        HttpFactory.getData(url).then(function (result) {
+            if (!result){
+                alert("没有更多数据!");
+                return;
+            }
+            if (!$scope.news.adsArray.length){
+                if(result[0].ads){
+                    //由于网易新闻有时候除了第一次之外没有头条用个数组存着
+                    $scope.news.adsArray = result[0].ads;
+                }
+            }
+            $scope.news.newsArray = result;
+            if ($scope.news.index === 0){
+                $scope.news.newsArray.splice(0,1);
+            }
+            $scope.$broadcast('scroll.refreshComplete');
+
+        });
     };
+
+
+
+
 
     //滑动页面
     $scope.dragOpenSlide = function () {
@@ -107,23 +128,112 @@ angular.module('myApp.news',[]).config(['$stateProvider',function ($stateProvide
     };
     
 //    按钮动画
-    $scope.btnArray=['头条','要闻','娱乐','体育','郑州','视频','财经','科技','汽车','时尚','图片','直播','热点','跟帖','房产','股票','家居','独家','游戏','网易号'];
+    $scope.btnArray=['头条','要闻','娱乐','体育','郑州','视频','财经','科技','汽车','时尚','图片','直播','热点','跟帖','房产','股票','家居','网易号','独家','游戏'];
+    $scope.boolChange=true;
     $scope.openBnts=function () {
-            var btns_icon = document.querySelector('#btnIcon');
-            var div=document.querySelector('#div');
-            if (btns_icon.style.transform == 'rotate(180deg)'){
-                btns_icon.setAttribute('style','transform:rotate(0deg)');
-                div.style.display='none';
-            }else {
-                btns_icon.setAttribute('style','transform:rotate(180deg)');
-                div.style.display='block';
-            }
+        var btns_icon = document.querySelector('#btnIcon');
+        var btnDiv = document.querySelector('#btnDiv');
+        if ($scope.boolChange){
+            btns_icon.setAttribute('style','transform:rotate(180deg)');
+            btnDiv.style.height='1000px';
+            $scope.boolChange=false;
+            $timeout(function () {
+                $rootScope.hideTabs=true;
+            },700);
 
+        }else {
+            btns_icon.setAttribute('style','transform:rotate(0deg)');
+            btnDiv.style.height='0';
+            $scope.boolChange=true;
+            $timeout(function () {
+                $rootScope.hideTabs=false;
+            },600);
+        }
     };
-    $scope.goDetail=function () {
-        $state.go('detail');
+    //进入详情页面
+    $scope.goDetail=function (index) {
+        console.log(index);
+        console.log($scope.news.newsArray);
+        var msg=$scope.news.newsArray[index].docid;
+        console.log(msg);
+        $state.go('newsSummary',{data:msg});
         $ionicViewSwitcher.nextDirection("forward");
+        //显示加载动画
+        $scope.show();
+    };
+    $scope.hide = function(){
+        $ionicLoading.hide();
+    };
+}]);
+/**
+ * Created by Administrator on 2016/11/12.
+ */
+angular.module('myApp.newsFactory',[]).factory('NewsFactory',['$http',function ($http) {
+    return {
+        getNewsData:function (url,func) {
+            var url = url;
+            $http({
+                url:url,
+                method:"GET",
+                timeout:12000,
+                cache:true
+            }).then(function success(result) {
+                result = result.data;
+                console.log(result);
+                func(result);
+            },function error(err) {
+                console.log("发生请求错误" + err);
+            })
+        }
     }
+}]);
+/**
+ * Created by Administrator on 2016/11/12.
+ */
+angular.module('myApp.newsSummaryC',[]).config(['$stateProvider',function ($stateProvider) {
+    $stateProvider.state("newsSummary",{
+        url:"/newsSummary",
+        templateUrl:"newsSummary.html",
+        controller:'newsSummaryController',
+        params:{data:null}
+    });
+}]).controller('newsSummaryController',['$scope','$stateParams','NewsFactory','$sce','$ionicLoading',function ($scope,$stateParams,NewsFactory,$sce,$ionicLoading) {
+    var docid=$stateParams.data;
+    $scope.newsSummary = {
+        detail:'',
+        body:'',
+        goBackView:function () {
+            window.history.go(-1);
+        }
+    };
+
+    var url = "http://localhost:3000/?myUrl=http://c.m.163.com/nc/article/" + docid +"/full.html";
+    NewsFactory.getNewsData(url,function (result) {
+        //隐藏加载动画
+        $scope.hide();
+        $scope.newsSummary.detail = result[docid];
+        console.log($scope.newsSummary.detail);
+        var newsObj = $scope.newsSummary.detail;
+        console.log(newsObj);
+        if (newsObj.img && newsObj.img.length){
+            for(var i = 0;i < newsObj.img.length;i++){
+                var imgWidth = newsObj.img[i].pixel.split('*')[0];
+                if(imgWidth > document.body.offsetWidth){
+                    imgWidth = document.body.offsetWidth;
+                }
+                var imgStyle = 'width:' + imgWidth + "px";
+                var imgStr = "<img" + " style='" + imgStyle + "'" + " src=" + newsObj.img[i].src + '>';
+                newsObj.body = newsObj.body.replace(newsObj.img[i].ref,imgStr);
+            }
+        }
+        $scope.newsSummary.body = $sce.trustAsHtml(newsObj.body);
+    });
+
+    // //隐藏加载动画
+    $scope.hide = function(){
+        $ionicLoading.hide();
+    };
+
 }]);
 /**
  * Created by qingyun on 16/11/30.
@@ -160,7 +270,7 @@ angular.module('myApp.search',[]).config(['$stateProvider',function ($stateProvi
 /**
  * Created by qingyun on 16/11/30.
  */
-angular.module('myApp.tabs',[]).controller('tabsController',['$scope',function ($scope) {
+angular.module('myApp.tabs',[]).controller('tabsController',['$scope','$ionicLoading',function ($scope,$ionicLoading) {
     $scope.$on('$stateChangeSuccess',function (evt,current,previous) {
         var update_wx_title = function(title) {
             var body = document.getElementsByTagName('body')[0];
@@ -193,7 +303,29 @@ angular.module('myApp.tabs',[]).controller('tabsController',['$scope',function (
 
 
     });
-}]);
+
+    $scope.show = function() {
+        $ionicLoading.show({
+            template: '<ion-spinner icon="ios"></ion-spinner>',
+            noBackdrop:true
+        });
+    };
+
+}]).directive('showTabs', function ($rootScope) {
+    return {
+        restrict: 'A',
+        link: function ($scope, $el) {
+            $rootScope.hideTabs = false;
+        }
+    };
+}).directive('hideTabs', function ($rootScope) {
+    return {
+        restrict: 'A',
+        link: function ($scope, $el) {
+            $rootScope.hideTabs = true;
+        }
+    };
+}) ;
 /**
  * Created by qingyun on 16/11/30.
  */
@@ -267,15 +399,22 @@ angular.module('myApp.slideBox',[]).directive('mgSlideBox',[function () {
                         '</ion-slide-box>' +
                     '<div class="slideBottomDiv"></div></div>',
         controller:['$scope','$element','$ionicSlideBoxDelegate','$state','$ionicViewSwitcher',function ($scope,$element,$ionicSlideBoxDelegate,$state,$ionicViewSwitcher) {
+
+            //$element代表引入的模板内容，在angular里面是JqLite元素，所以要加下标；lastElementChild是最后一个子元素，这里就是img
+            var lastSpan = $element[0].lastElementChild;
+
+
             //点击轮播图进入详情页
             $scope.goToDetailView = function (index) {
-                $state.go('detail');
+                // var wh=$scope.lastSpan[index];
+                console.log(lastSpan);
+                // $state.go('newsSummary',{data:wh});
+                $state.go('newsSummary');
                 $ionicViewSwitcher.nextDirection("forward");
                 console.log('进入详情页' + index);
             };
 
-            //$element代表引入的模板内容，在angular里面是JqLite元素，所以要加下标；lastElementChild是最后一个子元素，这里就是img
-            var lastSpan = $element[0].lastElementChild;
+
             //监听数据获取完成之后显示轮播图
             $scope.$watch('sourceArray',function (newVal,oldVal) {
                 if (newVal && newVal.length){

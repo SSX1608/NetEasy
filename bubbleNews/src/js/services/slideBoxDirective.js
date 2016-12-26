@@ -23,15 +23,22 @@ angular.module('myApp.slideBox',[]).directive('mgSlideBox',[function () {
                         '</ion-slide-box>' +
                     '<div class="slideBottomDiv"></div></div>',
         controller:['$scope','$element','$ionicSlideBoxDelegate','$state','$ionicViewSwitcher',function ($scope,$element,$ionicSlideBoxDelegate,$state,$ionicViewSwitcher) {
+
+            //$element代表引入的模板内容，在angular里面是JqLite元素，所以要加下标；lastElementChild是最后一个子元素，这里就是img
+            var lastSpan = $element[0].lastElementChild;
+
+
             //点击轮播图进入详情页
             $scope.goToDetailView = function (index) {
-                $state.go('detail');
+                // var wh=$scope.lastSpan[index];
+                console.log(lastSpan);
+                // $state.go('newsSummary',{data:wh});
+                $state.go('newsSummary');
                 $ionicViewSwitcher.nextDirection("forward");
                 console.log('进入详情页' + index);
             };
 
-            //$element代表引入的模板内容，在angular里面是JqLite元素，所以要加下标；lastElementChild是最后一个子元素，这里就是img
-            var lastSpan = $element[0].lastElementChild;
+
             //监听数据获取完成之后显示轮播图
             $scope.$watch('sourceArray',function (newVal,oldVal) {
                 if (newVal && newVal.length){

@@ -1,0 +1,31 @@
+
+<ion-view title="网易新闻">
+
+    <ion-nav-bar class="bar-assertive">
+        <ion-nav-buttons side="center">
+            <button class="backBtn" ng-click="newsSummary.goBackView()">返回</button>
+        </ion-nav-buttons>
+
+        <ion-nav-buttons side="right">
+            <a href="#/tabs/search" class="button icon-right ion-ios-search button-clear button-white"></a>
+            <a href="#/tabs/live" class="button icon-right  ion-social-youtube-outline button-clear button-white"></a>
+        </ion-nav-buttons>
+    </ion-nav-bar>
+
+    <ion-content>
+        <p class="placeholderP"></p>
+        <div>
+            <h3>新闻详情</h3>
+            <h4>{{newsSummary.detail.title}}</h4>
+            <span></span>
+            <div ng-bind-html="newsSummary.body"></div>
+        </div>
+    </ion-content>
+
+</ion-view>
+
+
+
+
+
+

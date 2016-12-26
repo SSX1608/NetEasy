@@ -15,24 +15,20 @@
 <!--副导航条subheader-->
     <ion-header-bar class="bar bar-subheader">
 
-        <ion-scroll direction="x" scrollbar-x="false">
+        <div class="scrollBar">
             <div class="barSlide">
                 <h5 ng-repeat="scrollItem in scrollItems">{{scrollItem}}</h5>
             </div>
-        </ion-scroll>
+        </div>
         <a id="btnIcon" class="button icon-left ion-ios-arrow-down button-clear button-dark" ng-click="openBnts()"></a>
-
     </ion-header-bar>
 
 <!--按钮页面-->
-    <div id="div" style="width: 100%; height: 100%; z-index: 998;color:red;background-color: rgba(255,255,255,.8);position: fixed;top: 88px;display: none">
-       <div style="width: 100%; height: 50px; position: absolute; top: 0; background-color: #e6b500;z-index: 999;" >
-           <button ng-repeat="btn in btnArray" class="button button-calm"  style="margin: 5px">{{btn}}</button>
-       </div>
-        <div style="width: 100%; height: 50px;position: absolute; bottom: 0; background-color: chartreuse;z-index: 999;">
-            <button ng-repeat="btn in btnArray" class="button button-calm"  style="margin: 5px">{{btn}}</button>
-        </div>
-    </div>
+       <ion-scroll id="btnDiv" scrollbar-y="true" style="text-align: center">
+               <button ng-repeat="btn in btnArray" class="button button-dark"  style="font-size: 14px;margin: 5px;width: 20%">{{btn}}</button>
+               <div style="height: 1000px"></div>
+       </ion-scroll>
+
 <!--新闻内容-->
     <!--下拉刷新-->
     <ion-content on-drag="dragOpenSlide()">
@@ -51,42 +47,59 @@
                 <!--相当于在此处引入template的模板-->
                 <mg-slide-box source-array="news.adsArray"></mg-slide-box>
                 <!--新闻列表-->
-                <ion-list ng-repeat="item in items" class="list" ng-click="goDetail()">
-                    <ion-item style="height: 100px" class="item item-thumbnail-left item-text-wrap">
-                        <img src="{{item.imgsrc}}" alt="" style="width: 150px;height: 70px">
-                        <span class="io">{{item.title}}</span>
-                        <p>{{item.source}}</p>
-                    </ion-item>
+                <ion-list ng-repeat="news in news.newsArray track by $index" class="list" ng-click="goDetail($index)">
+
+                    <div ng-if="!news.imgnewextra && news.imgType != '1'">
+                        <ion-item style="height: 100px" class="item item-thumbnail-left item-text-wrap">
+                            <img ng-src="{{news.imgsrc}}" alt="" style="width: 150px;height: 70px">
+                            <span class="io">{{news.title}}</span>
+                            <p class="source">{{news.source}}</p>
+                        </ion-item>
+                    </div>
+
+                    <div ng-if="news.imgnewextra && news.imgType != '1'">
+                            <p class="io">{{news.title}}</p>
+                            <img ng-src="{{news.imgsrc}}" alt="" style="width: 30%;height: 70px">
+                            <img ng-src="{{news.imgnewextra[0].imgsrc}}" alt="" style="width: 30%;height: 70px">
+                            <img ng-src="{{news.imgnewextra[1].imgsrc}}" alt="" style="width: 30%;height: 70px">
+                            <p class="source">{{news.source}}</p>
+                    </div>
+
+                    <div ng-if="news.imgType == '1'">
+                            <p class="io">{{news.title}}</p>
+                            <img ng-src="{{news.imgsrc}}" alt="" style="width: 100%;height: 80px">
+                            <p class="source">{{news.source}}</p>
+                    </div>
+
                 </ion-list>
             </ion-slide>
 
             <!--滑动页面2-->
             <ion-slide>
                 <mg-slide-box source-array="news.newsArray"></mg-slide-box>
-                <ion-item ng-repeat="item in items">
-                    {{item.title}}
+                <ion-item ng-repeat="news in news.newsArray">
+                    {{news.title}}
                 </ion-item>
             </ion-slide>
 
             <!--滑动页面3-->
             <ion-slide>
                 <mg-slide-box source-array="news.newsArray"></mg-slide-box>
-                <ion-item ng-repeat="item in items">
-                    {{item.title}}
+                <ion-item ng-repeat="news in news.newsArray">
+                    {{news.title}}
                 </ion-item>
             </ion-slide>
         </ion-slide-box>
 
         <!--上拉加载-->
         <ion-infinite-scroll
-                on-infinite="loadMore('上拉')"
+                on-infinite="loadMore()"
                 distance="1%"
                 spinner="android"
                 icon="ion-home"
-                immediate-check="false"
-                ng-if="isShowInfinite">
+                immediate-check="true">
         </ion-infinite-scroll>
-
+    <!--immediate-check="true"加载时自动刷新一次，默认true-->
     </ion-content>
 
 </ion-view>

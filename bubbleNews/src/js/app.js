@@ -1,7 +1,7 @@
 /**
  * Created by qingyun on 16/11/30.
  */
-angular.module('myApp',['ionic','myApp.httpFactory','myApp.slideBox','myApp.tabs','myApp.news','myApp.search','myApp.live','myApp.topic','myApp.personal']).config(['$stateProvider','$urlRouterProvider','$ionicConfigProvider',function ($stateProvider,$urlRouterProvider,$ionicConfigProvider) {
+angular.module('myApp',['ionic','myApp.httpFactory','myApp.slideBox','myApp.tabs','myApp.news','myApp.search','myApp.live','myApp.topic','myApp.personal','myApp.newsSummaryC','myApp.newsFactory']).config(['$stateProvider','$urlRouterProvider','$ionicConfigProvider',function ($stateProvider,$urlRouterProvider,$ionicConfigProvider) {
     $ionicConfigProvider.views.transition('ios');
     $ionicConfigProvider.tabs.position('bottom');
     $ionicConfigProvider.navBar.alignTitle('center');
@@ -11,10 +11,6 @@ angular.module('myApp',['ionic','myApp.httpFactory','myApp.slideBox','myApp.tabs
         abstract:true,
         templateUrl:"tabs.html",
         controller:'tabsController'
-    }).state("detail",{
-        url:"/detail",
-        templateUrl:"detail.html"
-        // controller:'detailController'
     });
     $urlRouterProvider.otherwise('tabs/news');
 }]);
